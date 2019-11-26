@@ -1,10 +1,30 @@
-function component() {
-  const element = document.createElement('div');
+import './app';
 
-  // Lodash, currently included via a script, is required for this line to work
-  element.innerHTML = `Hello webpack!`;
+const globalStyles = `
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    font-family: Roboto, Arial;
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+  }
+  main {
+    display: block;
+  }
+  pre {
+    font-family: monospace, monospace;
+    font-size: 1em;
+  }
+`;
 
-  return element;
-}
+const styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(globalStyles));
 
-document.body.appendChild(component());
+const customElement = document.createElement('my-app');
+
+document.head.appendChild(styleElement);
+document.body.appendChild(customElement);
