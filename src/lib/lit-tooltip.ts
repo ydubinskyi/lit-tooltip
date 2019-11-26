@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map.js';
 
 @customElement('lit-tooltip')
-class MyElement extends LitElement {
+class LitTooltipElement extends LitElement {
   @property()
   for: string;
 
