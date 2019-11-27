@@ -1,55 +1,33 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map.js';
+import {styleMap} from 'lit-html/directives/style-map.js';
 
 @customElement('lit-tooltip')
 class LitTooltipElement extends LitElement {
-  @property()
-  for: string;
-
   _target;
 
+  @property({type: String})
+  content = '';
+
+  @property({type: String})
+  position = 'bottom';
+
   @property({type: Boolean})
-  _showing: boolean;
+  fitToVisibleBounds = false;
 
-  get target() {
-    const parentNode = this.parentNode;
+  @property({type: Number})
+  offset = 12;
 
-    let target;
-
-    if (this.for) {
-      target = parentNode.querySelector('#' + this.for);
-    } else {
-      target = parentNode;
-    }
-    return target;
-  }
-
-  static get styles() {
-    return css`
-      :host {
-        display: block;
-        position: absolute;
-        outline: none;
-        z-index: 1002;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        -webkit-user-select: none;
-        user-select: none;
-        cursor: default;
-      }
-      #tooltip {
-        display: block;
-        outline: none;
-        font-size: 11px;
-        line-height: 1;
-        background-color: #616161;
-        color: white;
-        padding: 8px;
-        border-radius: 2px;
-      }
-      .hidden {
-        display: none !important;
-      }
+  render() {
+    return html`
+      <slot
+        @mouseenter="${(e) => this.show(e)}"
+        @focus="${(e) => this.show(e)}"
+        @mouseleave="${(e) => this.hide(e)}"
+        @blur="${(e) => this.hide(e)}"
+        @tap="${(e) => this.hide(e)}"
+      >
+      </slot>
     `;
   }
 
@@ -60,48 +38,27 @@ class LitTooltipElement extends LitElement {
     this.hide = this.hide.bind(this);
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this._findTarget();
-    setTimeout(() => {
-      this._addListeners();
+  show(e) {
+    let event = new CustomEvent('show-tooltip', {
+      detail: {
+        target: e.target,
+        content: this.content,
+        offset: this.offset,
+      },
+      bubbles: true,
+      composed: true,
     });
+    this.dispatchEvent(event);
   }
 
-  _addListeners() {
-    if (this._target) {
-      this._target.addEventListener('mouseenter', this.show);
-      this._target.addEventListener('focus', this.show);
-      this._target.addEventListener('mouseleave', this.hide);
-      this._target.addEventListener('blur', this.hide);
-      this._target.addEventListener('tap', this.hide);
-    }
-  }
-
-  _findTarget() {
-    this._target = this.target;
-  }
-
-  show() {
-    if (this._showing) return;
-
-    this._showing = true;
-    this.requestUpdate();
-  }
-
-  hide() {
-    if (!this._showing) return;
-
-    this._showing = false;
-    this.requestUpdate();
-  }
-
-  render() {
-    let classes = {hidden: !this._showing};
-    return html`
-      <div id="tooltip" class=${classMap(classes)}>
-        <slot></slot>
-      </div>
-    `;
+  hide(e) {
+    let event = new CustomEvent('hide-tooltip', {
+      detail: {
+        target: e.target,
+      },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
   }
 }

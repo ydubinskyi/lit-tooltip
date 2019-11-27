@@ -1,6 +1,7 @@
 import {LitElement, html, customElement, property, css} from 'lit-element';
 
 import './lib/lit-tooltip';
+import './lib/lit-tooltip-root';
 
 @customElement('my-app')
 export class AppElement extends LitElement {
@@ -36,6 +37,7 @@ export class AppElement extends LitElement {
       .card {
         display: block;
         padding: 24px;
+        margin-bottom: 12px;
         background: #fff;
         box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
       }
@@ -50,10 +52,17 @@ export class AppElement extends LitElement {
 
       <section>
         <div class="card">
-          <button id="button_01">Some button</button>
-          <lit-tooltip for="button_01">Tooltip sloted text</lit-tooltip>
+          <lit-tooltip content="Tooltip text 1">
+            <button id="button_01">Some button 01</button>
+          </lit-tooltip>
+        </div>
+        <div class="card">
+          <lit-tooltip content="Tooltip text 2">
+            <button>Some button 02</button>
+          </lit-tooltip>
         </div>
       </section>
+      <lit-tooltip-root></lit-tooltip-root>
     `;
   }
 }
