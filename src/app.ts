@@ -52,14 +52,12 @@ export class AppElement extends LitElement {
 
       <section>
         <div class="card">
-          <lit-tooltip content="Tooltip text 1">
-            <button id="button_01">Some button 01</button>
-          </lit-tooltip>
+          <button id="button_01">Some button 01</button>
+          <lit-tooltip for="button_01" content="Tooltip text 1"></lit-tooltip>
         </div>
         <div class="card">
-          <lit-tooltip content="Tooltip text 2">
-            <button>Some button 02</button>
-          </lit-tooltip>
+          <button>Some button 02</button>
+          <lit-tooltip content="Tooltip text 2"></lit-tooltip>
         </div>
       </section>
       <lit-tooltip-root></lit-tooltip-root>
