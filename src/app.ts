@@ -61,6 +61,13 @@ export class AppElement extends LitElement {
           <lit-tooltip content="Tooltip text 2"></lit-tooltip>
         </div>
         <div class="card">
+          <button id="button_03">Some button 03</button>
+          <lit-tooltip
+            for="button_03"
+            content="Tooltip 3 long long long long long long long long long long long long long text"
+          ></lit-tooltip>
+        </div>
+        <div class="card">
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit, quidem ipsum qui, est sit magni in soluta
             iusto perspiciatis voluptatum fugiat necessitatibus earum! Corporis soluta maiores illum cum consequatur
