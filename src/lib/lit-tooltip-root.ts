@@ -11,11 +11,12 @@ class LitTooltipRootElement extends LitElement {
   _content: string = '';
 
   @property()
+  position = 'bottom';
+
+  @property()
   _position = {
     top: '',
-    bottom: '',
     left: '',
-    right: '',
   };
 
   static get styles() {
@@ -30,6 +31,7 @@ class LitTooltipRootElement extends LitElement {
         color: white;
         padding: 8px;
         border-radius: 2px;
+        z-index: 1002;
       }
       .hidden {
         display: none !important;
@@ -57,16 +59,56 @@ class LitTooltipRootElement extends LitElement {
     super.connectedCallback();
     const body = document.querySelector('body');
 
-    body.addEventListener('show-tooltip', (e) => this.showTooltip(e));
-    body.addEventListener('hide-tooltip', (e) => this.hideTooltip(e));
+    body.addEventListener('show-tooltip', this.showTooltip);
+    body.addEventListener('hide-tooltip', this.hideTooltip);
   }
 
-  showTooltip(e) {
+  async showTooltip({detail}: CustomEvent) {
     this._showing = true;
-    this._content = e.detail.content;
+    this._content = detail.content;
+
+    await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+
+    this.updatePosition(detail.target);
   }
 
   hideTooltip(e) {
     this._showing = false;
+  }
+
+  updatePosition(target) {
+    const offset = 12;
+
+    var parentRect = this.offsetParent.getBoundingClientRect();
+    var targetRect = target.getBoundingClientRect();
+    var thisRect = this.shadowRoot.getElementById('tooltip').getBoundingClientRect();
+    var horizontalCenterOffset = (targetRect.width - thisRect.width) / 2;
+    var verticalCenterOffset = (targetRect.height - thisRect.height) / 2;
+    var targetLeft = targetRect.left - parentRect.left;
+    var targetTop = targetRect.top - parentRect.top;
+    var tooltipLeft, tooltipTop;
+    switch (this.position) {
+      case 'top':
+        tooltipLeft = targetLeft + horizontalCenterOffset;
+        tooltipTop = targetTop - thisRect.height - offset;
+        break;
+      case 'bottom':
+        tooltipLeft = targetLeft + horizontalCenterOffset;
+        tooltipTop = targetTop + targetRect.height + offset;
+        break;
+      case 'left':
+        tooltipLeft = targetLeft - thisRect.width - offset;
+        tooltipTop = targetTop + verticalCenterOffset;
+        break;
+      case 'right':
+        tooltipLeft = targetLeft + targetRect.width + offset;
+        tooltipTop = targetTop + verticalCenterOffset;
+        break;
+    }
+
+    this._position = {
+      top: tooltipTop + 'px',
+      left: tooltipLeft + 'px',
+    };
   }
 }
