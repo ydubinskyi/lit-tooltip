@@ -93,13 +93,12 @@ class LitTooltipContainerElement extends LitElement {
 
   updatePosition(target) {
     const offset = this.offset;
-    const parentRect = this.offsetParent.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
     const thisRect = this.shadowRoot.getElementById('tooltip').getBoundingClientRect();
     const horizontalCenterOffset = (targetRect.width - thisRect.width) / 2;
     const verticalCenterOffset = (targetRect.height - thisRect.height) / 2;
-    const targetLeft = targetRect.left - parentRect.left;
-    const targetTop = targetRect.top - parentRect.top;
+    const targetLeft = targetRect.left;
+    const targetTop = targetRect.top;
 
     let tooltipCoords: any = {};
     switch (this.position) {
@@ -122,19 +121,19 @@ class LitTooltipContainerElement extends LitElement {
     }
 
     // Clip the left/right side
-    if (parentRect.left + tooltipCoords.left + thisRect.width > window.innerWidth) {
+    if (tooltipCoords.left + thisRect.width > window.innerWidth) {
       tooltipCoords.right = '0px';
       tooltipCoords.left = 'auto';
     } else {
-      tooltipCoords.left = Math.max(0, tooltipCoords.left) + 'px';
+      tooltipCoords.left = Math.max(offset, tooltipCoords.left) + 'px';
       tooltipCoords.right = 'auto';
     }
     // Clip the top/bottom side.
-    if (parentRect.top + tooltipCoords.top + thisRect.height > window.innerHeight) {
-      tooltipCoords.bottom = parentRect.height - targetTop + offset + 'px';
+    if (tooltipCoords.top + thisRect.height > window.innerHeight) {
+      tooltipCoords.bottom = targetTop + offset + 'px';
       tooltipCoords.top = 'auto';
     } else {
-      tooltipCoords.top = Math.max(-parentRect.top, tooltipCoords.top) + 'px';
+      tooltipCoords.top = tooltipCoords.top + 'px';
       tooltipCoords.bottom = 'auto';
     }
 
