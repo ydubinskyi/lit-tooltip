@@ -1,31 +1,29 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {classMap} from 'lit-html/directives/class-map.js';
-import {styleMap} from 'lit-html/directives/style-map.js';
+import {LitElement, html, css, customElement, property, query} from 'lit-element';
 
 @customElement('lit-tooltip')
 class LitTooltipElement extends LitElement {
   @property({type: String})
-  for;
-
-  @property({type: String})
-  content = '';
+  for: string;
 
   @property({type: String})
   position = 'bottom';
 
-  @property({type: Boolean})
-  fitToVisibleBounds = false;
-
   @property({type: Number})
   offset = 12;
 
-  _target;
+  @query('#slot')
+  protected slotEl: HTMLSlotElement;
+
+  private _slottedContent: Node[];
+
+  private _target: HTMLElement;
 
   get target() {
     const parentNode = this.parentNode;
-
     const ownerRoot: any = this.getRootNode();
+
     let target;
+
     if (this.for) {
       target = parentNode.querySelector('#' + this.for);
     } else {
@@ -35,9 +33,17 @@ class LitTooltipElement extends LitElement {
     return target;
   }
 
+  static get styles() {
+    return css`
+      #slot {
+        display: none;
+      }
+    `;
+  }
+
   render() {
     return html`
-      <slot></slot>
+      <slot id="slot"></slot>
     `;
   }
 
@@ -48,14 +54,52 @@ class LitTooltipElement extends LitElement {
     this.hide = this.hide.bind(this);
   }
 
+  /** @override */
   connectedCallback() {
     super.connectedCallback();
 
-    this._target = this.target;
     this._addListeners();
   }
 
+  /** @override */
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    this._removeEventListeners();
+  }
+
+  /** @override */
+  firstUpdated() {
+    this._slottedContent = this.slotEl.assignedNodes({flatten: false});
+  }
+
+  show() {
+    if (this._slottedContent) {
+      let event = new CustomEvent('show-tooltip', {
+        detail: {
+          target: this._target,
+          content: this._slottedContent,
+          offset: this.offset,
+          position: this.position,
+        },
+        bubbles: true,
+        composed: true,
+      });
+      this.dispatchEvent(event);
+    }
+  }
+
+  hide() {
+    let event = new CustomEvent('hide-tooltip', {
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
+  }
+
   _addListeners() {
+    this._target = this.target;
+
     if (this._target) {
       this._target.addEventListener('mouseenter', this.show, {passive: true});
       this._target.addEventListener('focus', this.show, {passive: true});
@@ -65,27 +109,13 @@ class LitTooltipElement extends LitElement {
     }
   }
 
-  show(e) {
-    let event = new CustomEvent('show-tooltip', {
-      detail: {
-        target: this._target,
-        content: this.content,
-        offset: this.offset,
-      },
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(event);
-  }
-
-  hide(e) {
-    let event = new CustomEvent('hide-tooltip', {
-      detail: {
-        target: this._target,
-      },
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(event);
+  _removeEventListeners() {
+    if (this._target) {
+      this._target.removeEventListener('mouseenter', this.show);
+      this._target.removeEventListener('focus', this.show);
+      this._target.removeEventListener('mouseleave', this.hide);
+      this._target.removeEventListener('blur', this.hide);
+      this._target.removeEventListener('tap', this.hide);
+    }
   }
 }

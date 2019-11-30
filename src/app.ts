@@ -1,7 +1,7 @@
-import {LitElement, html, customElement, property, css} from 'lit-element';
+import {LitElement, html, customElement, css} from 'lit-element';
 
 import './lib/lit-tooltip';
-import './lib/lit-tooltip-root';
+import './lib/lit-tooltip-container';
 
 @customElement('my-app')
 export class AppElement extends LitElement {
@@ -48,24 +48,39 @@ export class AppElement extends LitElement {
     return html`
       <header class="app-header">
         <h1 id="fixed_title">lit-tooltip demo</h1>
-        <lit-tooltip for="fixed_title" content="Fixed title tooltip"></lit-tooltip>
+        <lit-tooltip for="fixed_title">
+          Fixed title tooltip
+        </lit-tooltip>
       </header>
 
       <section>
         <div class="card">
           <button id="button_01">Some button 01</button>
-          <lit-tooltip for="button_01" content="Tooltip text 1"></lit-tooltip>
+          <lit-tooltip for="button_01" position="right">
+            Tooltip text 1
+          </lit-tooltip>
         </div>
         <div class="card">
           <button>Some button 02</button>
-          <lit-tooltip content="Tooltip text 2"></lit-tooltip>
+          <lit-tooltip>
+            Tooltip text 2
+            <span>${Math.random()}</span>
+          </lit-tooltip>
         </div>
         <div class="card">
           <button id="button_03">Some button 03</button>
-          <lit-tooltip
-            for="button_03"
-            content="Tooltip 3 long long long long long long long long long long long long long text"
-          ></lit-tooltip>
+          <lit-tooltip for="button_03">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit, quidem ipsum qui, est sit magni in soluta
+            iusto perspiciatis voluptatum fugiat necessitatibus earum! Corporis soluta maiores illum cum consequatur
+            dolorem, molestias aliquid aspernatur dolor perferendis ipsum saepe dolore, corrupti laborum recusandae
+            asperiores sit quisquam. Consequatur hic, iure placeat officia aliquid nihil, nulla repellat adipisci quas
+          </lit-tooltip>
+        </div>
+        <div class="card">
+          <button id="button_04">Some button 04</button>
+          <lit-tooltip for="button_04">
+            Tooltip text 2
+          </lit-tooltip>
         </div>
         <div class="card">
           <p>
@@ -109,7 +124,7 @@ export class AppElement extends LitElement {
           </p>
         </div>
       </section>
-      <lit-tooltip-root></lit-tooltip-root>
+      <lit-tooltip-container></lit-tooltip-container>
     `;
   }
 }
