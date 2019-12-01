@@ -88,6 +88,8 @@ class LitTooltipContainerElement extends LitElement {
   }
 
   hideTooltip() {
+    if (!this._showing) return;
+
     this._showing = false;
   }
 
@@ -120,21 +122,17 @@ class LitTooltipContainerElement extends LitElement {
         break;
     }
 
-    // Clip the left/right side
     if (tooltipCoords.left + thisRect.width > window.innerWidth) {
       tooltipCoords.right = '0px';
       tooltipCoords.left = 'auto';
     } else {
-      tooltipCoords.left = Math.max(offset, tooltipCoords.left) + 'px';
-      tooltipCoords.right = 'auto';
+      tooltipCoords.left = Math.max(targetLeft, tooltipCoords.left) + 'px';
     }
-    // Clip the top/bottom side.
+
     if (tooltipCoords.top + thisRect.height > window.innerHeight) {
-      tooltipCoords.bottom = targetTop + offset + 'px';
-      tooltipCoords.top = 'auto';
+      tooltipCoords.top = targetTop - thisRect.height - offset + 'px';
     } else {
       tooltipCoords.top = tooltipCoords.top + 'px';
-      tooltipCoords.bottom = 'auto';
     }
 
     this._position = {
@@ -145,10 +143,16 @@ class LitTooltipContainerElement extends LitElement {
   _addEventListeners() {
     document.body.addEventListener('show-tooltip', this.showTooltip);
     document.body.addEventListener('hide-tooltip', this.hideTooltip);
+    window.addEventListener('scroll', this.hideTooltip, {passive: true});
+
+    this.addEventListener('mouseenter', this.hideTooltip, {passive: true});
   }
 
   _removeEventListeners() {
     document.body.removeEventListener('show-tooltip', this.showTooltip);
     document.body.removeEventListener('hide-tooltip', this.hideTooltip);
+    document.body.removeEventListener('scroll', this.hideTooltip);
+
+    this.removeEventListener('mouseenter', this.hideTooltip);
   }
 }
