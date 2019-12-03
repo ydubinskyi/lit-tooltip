@@ -103,6 +103,23 @@ export class AppElement extends LitElement {
           </lit-tooltip>
         </div>
         <div class="card">
+          <button id="button_05">Some button 05</button>
+          <p>Position: right</p>
+          <lit-tooltip for="button_05" position="right">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit, quidem ipsum qui, est sit magni in soluta
+            iusto perspiciatis voluptatum fugiat necessitatibus earum! Corporis soluta maiores illum cum consequatur
+            dolorem, molestias aliquid aspernatur dolor perferendis ipsum saepe dolore, corrupti laborum recusandae
+            asperiores sit quisquam. Consequatur hic, iure placeat officia aliquid nihil, nulla repellat adipisci quas
+          </lit-tooltip>
+        </div>
+        <div class="card align-right">
+          <button id="button_06">Some button 06</button>
+          <p>Position: right</p>
+          <lit-tooltip for="button_06" position="bottom">
+            Tooltip text position bottom text test test test
+          </lit-tooltip>
+        </div>
+        <div class="card">
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit, quidem ipsum qui, est sit magni in soluta
             iusto perspiciatis voluptatum fugiat necessitatibus earum! Corporis soluta maiores illum cum consequatur

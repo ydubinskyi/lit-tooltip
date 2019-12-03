@@ -33,6 +33,7 @@ class LitTooltipContainerElement extends LitElement {
         background-color: #616161;
         color: white;
         padding: 8px;
+        margin-right: 18px;
         border-radius: 2px;
         z-index: 1002;
 
