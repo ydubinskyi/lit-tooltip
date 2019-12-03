@@ -17,7 +17,7 @@ class LitTooltipContainerElement extends LitElement {
   offset = 12;
 
   @property()
-  _position = {
+  tooltipPosition = {
     top: '',
     left: '',
   };
@@ -28,8 +28,8 @@ class LitTooltipContainerElement extends LitElement {
         display: block;
         position: fixed;
         outline: none;
-        font-size: 11px;
-        line-height: 1;
+        font-size: 12px;
+        line-height: 14px;
         background-color: #616161;
         color: white;
         padding: 8px;
@@ -48,7 +48,7 @@ class LitTooltipContainerElement extends LitElement {
   render() {
     let classes = {hidden: !this._showing};
     return html`
-      <div id="tooltip" class=${classMap(classes)} style=${styleMap(this._position)}>
+      <div id="tooltip" class=${classMap(classes)} style=${styleMap(this.tooltipPosition)}>
         ${this._tooltipContent}
       </div>
     `;
@@ -102,41 +102,46 @@ class LitTooltipContainerElement extends LitElement {
     const targetLeft = targetRect.left;
     const targetTop = targetRect.top;
 
-    let tooltipCoords: any = {};
+    let tooltipTop;
+    let tooltipLeft;
     switch (this.position) {
       case 'top':
-        tooltipCoords.left = targetLeft + horizontalCenterOffset;
-        tooltipCoords.top = targetTop - thisRect.height - offset;
+        tooltipLeft = targetLeft + horizontalCenterOffset;
+        tooltipTop = targetTop - thisRect.height - offset;
         break;
       case 'bottom':
-        tooltipCoords.left = targetLeft + horizontalCenterOffset;
-        tooltipCoords.top = targetTop + targetRect.height + offset;
+        tooltipLeft = targetLeft + horizontalCenterOffset;
+        tooltipTop = targetTop + targetRect.height + offset;
         break;
       case 'left':
-        tooltipCoords.left = targetLeft - thisRect.width - offset;
-        tooltipCoords.top = targetTop + verticalCenterOffset;
+        tooltipLeft = targetLeft - thisRect.width - offset;
+        tooltipTop = targetTop + verticalCenterOffset;
         break;
       case 'right':
-        tooltipCoords.left = targetLeft + targetRect.width + offset;
-        tooltipCoords.top = targetTop + verticalCenterOffset;
+        tooltipLeft = targetLeft + targetRect.width + offset;
+        tooltipTop = targetTop + verticalCenterOffset;
         break;
     }
 
-    if (tooltipCoords.left + thisRect.width > window.innerWidth) {
-      tooltipCoords.right = '0px';
-      tooltipCoords.left = 'auto';
+    if (tooltipLeft + thisRect.width > window.innerWidth) {
+      tooltipLeft = targetLeft - thisRect.width - offset;
+    } else if (tooltipLeft < 0 && this.position === 'left') {
+      tooltipLeft = targetLeft + targetRect.width + offset;
     } else {
-      tooltipCoords.left = Math.max(targetLeft, tooltipCoords.left) + 'px';
+      tooltipLeft = Math.max(targetLeft, tooltipLeft);
     }
 
-    if (tooltipCoords.top + thisRect.height > window.innerHeight) {
-      tooltipCoords.top = targetTop - thisRect.height - offset + 'px';
+    if (tooltipTop + thisRect.height > window.innerHeight) {
+      tooltipTop = targetTop - thisRect.height - offset;
+    } else if (tooltipTop < 0) {
+      tooltipTop = targetTop + targetRect.height + offset;
     } else {
-      tooltipCoords.top = tooltipCoords.top + 'px';
+      tooltipTop = tooltipTop;
     }
 
-    this._position = {
-      ...tooltipCoords,
+    this.tooltipPosition = {
+      top: tooltipTop + 'px',
+      left: tooltipLeft + 'px',
     };
   }
 

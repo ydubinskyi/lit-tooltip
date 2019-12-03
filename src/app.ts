@@ -89,7 +89,7 @@ export class AppElement extends LitElement {
         <div class="card">
           <button id="button_03">Some button 03</button>
           <p>Position: top</p>
-          <lit-tooltip for="button_03">
+          <lit-tooltip for="button_03" position="top">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit, quidem ipsum qui, est sit magni in soluta
             iusto perspiciatis voluptatum fugiat necessitatibus earum! Corporis soluta maiores illum cum consequatur
             dolorem, molestias aliquid aspernatur dolor perferendis ipsum saepe dolore, corrupti laborum recusandae
