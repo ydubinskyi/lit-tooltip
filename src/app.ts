@@ -11,7 +11,7 @@ export class AppElement extends LitElement {
         display: block;
         background: #fafafa;
         padding: 96px 24px 24px;
-        height: 100vh;
+        min-height: 100vh;
       }
 
       button {
@@ -51,6 +51,7 @@ export class AppElement extends LitElement {
         display: block;
         padding: 24px;
         margin-bottom: 12px;
+        border-radius: 2px;
         background: #fff;
         box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
       }
