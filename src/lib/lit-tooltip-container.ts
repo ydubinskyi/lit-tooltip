@@ -4,36 +4,32 @@ import {styleMap} from 'lit-html/directives/style-map.js';
 
 @customElement('lit-tooltip-container')
 class LitTooltipContainerElement extends LitElement {
-  /** Content for tooltip */
-  @property()
-  content: string = '';
+  @property({attribute: false})
+  content = '';
 
-  /** Position of the tooltip related to its target.  */
-  @property()
-  position = 'bottom';
-
-  /** Spacing between the tooltip and the target.  */
-  @property({type: Number})
-  offset = 12;
-
-  @property()
+  @property({attribute: false})
   tooltipPosition = {
     top: '',
     left: '',
   };
 
-  @property()
+  @property({attribute: false})
   tooltipVisible = false;
 
-  @property()
+  @property({attribute: false})
   entryAnimation = false;
 
-  @property()
+  @property({attribute: false})
   exitAnimation = false;
 
   _showing = false;
 
   _animationPlaying = false;
+
+  _tooltipConfig = {
+    offset: 12,
+    position: 'bottom',
+  };
 
   static get styles() {
     return css`
@@ -107,7 +103,7 @@ class LitTooltipContainerElement extends LitElement {
         id="tooltip"
         class=${classMap(classes)}
         style=${styleMap(this.tooltipPosition)}
-        @animationend="${this._onAnimationEnd()}"
+        @animationend="${this._onAnimationEnd}"
       >
         ${this.content}
       </div>
@@ -143,20 +139,29 @@ class LitTooltipContainerElement extends LitElement {
     this.tooltipVisible = true;
     this.exitAnimation = false;
 
-    // Get config for the tooltip
-    this.content = detail.content;
-    this.position = detail.position;
-    this.offset = detail.offset;
+    this.tooltipPosition = {
+      top: '',
+      left: '',
+    };
+
+    const {content, position, offset, target} = detail;
+
+    // Get config and content for the tooltip
+    this.content = content;
+    this._tooltipConfig = {
+      position,
+      offset,
+    };
 
     // Need to wait to calculate the tooltip size to properly update position
     await new Promise((resolve) => requestAnimationFrame(() => resolve()));
-    this.updatePosition(detail.target);
+    this.updatePosition(target);
 
     this._animationPlaying = true;
     this.entryAnimation = true;
   }
 
-  async hideTooltip() {
+  hideTooltip() {
     if (!this._showing) return;
 
     if (this._animationPlaying) {
@@ -193,8 +198,9 @@ class LitTooltipContainerElement extends LitElement {
     }
   }
 
-  updatePosition(target) {
-    const offset = this.offset;
+  updatePosition(target: HTMLElement) {
+    const {offset, position} = this._tooltipConfig;
+
     const targetRect = target.getBoundingClientRect();
     const thisRect = this.shadowRoot.getElementById('tooltip').getBoundingClientRect();
     const horizontalCenterOffset = (targetRect.width - thisRect.width) / 2;
@@ -204,7 +210,7 @@ class LitTooltipContainerElement extends LitElement {
 
     let tooltipTop;
     let tooltipLeft;
-    switch (this.position) {
+    switch (position) {
       case 'top':
         tooltipLeft = targetLeft + horizontalCenterOffset;
         tooltipTop = targetTop - thisRect.height - offset;
@@ -225,7 +231,7 @@ class LitTooltipContainerElement extends LitElement {
 
     if (tooltipLeft + thisRect.width > window.innerWidth) {
       tooltipLeft = targetLeft - thisRect.width - offset;
-    } else if (tooltipLeft < 0 && this.position === 'left') {
+    } else if (tooltipLeft < 0 && position === 'left') {
       tooltipLeft = targetLeft + targetRect.width + offset;
     } else {
       tooltipLeft = Math.max(targetLeft, tooltipLeft);
