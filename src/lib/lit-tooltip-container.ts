@@ -4,15 +4,15 @@ import {styleMap} from 'lit-html/directives/style-map.js';
 
 @customElement('lit-tooltip-container')
 class LitTooltipContainerElement extends LitElement {
-  @property({type: Boolean})
-  _showing: boolean;
-
+  /** Content for tooltip */
   @property()
-  _tooltipContent: string = '';
+  content: string = '';
 
+  /** Position of the tooltip related to its target.  */
   @property()
   position = 'bottom';
 
+  /** Spacing between the tooltip and the target.  */
   @property({type: Number})
   offset = 12;
 
@@ -21,6 +21,19 @@ class LitTooltipContainerElement extends LitElement {
     top: '',
     left: '',
   };
+
+  @property()
+  tooltipVisible = false;
+
+  @property()
+  entryAnimation = false;
+
+  @property()
+  exitAnimation = false;
+
+  _showing = false;
+
+  _animationPlaying = false;
 
   static get styles() {
     return css`
@@ -43,14 +56,60 @@ class LitTooltipContainerElement extends LitElement {
       .hidden {
         display: none !important;
       }
+
+      .entry-animation {
+        opacity: 0;
+        animation-delay: 200ms;
+        animation-name: keyFrameFadeInOpacity;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-in;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+      }
+      .exit-animation {
+        opacity: 0.9;
+        animation-delay: 0ms;
+        animation-name: keyFrameFadeOutOpacity;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-in;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+      }
+
+      @keyframes keyFrameFadeInOpacity {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 0.9;
+        }
+      }
+      @keyframes keyFrameFadeOutOpacity {
+        0% {
+          opacity: 0.9;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
     `;
   }
 
   render() {
-    let classes = {hidden: !this._showing};
+    let classes = {
+      hidden: !this.tooltipVisible,
+      'entry-animation': this.entryAnimation,
+      'exit-animation': this.exitAnimation,
+    };
+
     return html`
-      <div id="tooltip" class=${classMap(classes)} style=${styleMap(this.tooltipPosition)}>
-        ${this._tooltipContent}
+      <div
+        id="tooltip"
+        class=${classMap(classes)}
+        style=${styleMap(this.tooltipPosition)}
+        @animationend="${this._onAnimationEnd()}"
+      >
+        ${this.content}
       </div>
     `;
   }
@@ -77,21 +136,61 @@ class LitTooltipContainerElement extends LitElement {
   }
 
   async showTooltip({detail}: CustomEvent) {
+    if (this._showing) return;
+
     this._showing = true;
 
-    this._tooltipContent = detail.content;
+    this.tooltipVisible = true;
+    this.exitAnimation = false;
+
+    // Get config for the tooltip
+    this.content = detail.content;
     this.position = detail.position;
     this.offset = detail.offset;
 
+    // Need to wait to calculate the tooltip size to properly update position
     await new Promise((resolve) => requestAnimationFrame(() => resolve()));
-
     this.updatePosition(detail.target);
+
+    this._animationPlaying = true;
+    this.entryAnimation = true;
   }
 
-  hideTooltip() {
+  async hideTooltip() {
     if (!this._showing) return;
 
+    if (this._animationPlaying) {
+      this._showing = false;
+      this._cancelAnimation();
+      return;
+    } else {
+      this._onAnimationFinish();
+    }
+
     this._showing = false;
+    this._animationPlaying = true;
+  }
+
+  _cancelAnimation() {
+    this.entryAnimation = false;
+    this.exitAnimation = false;
+
+    this.tooltipVisible = false;
+  }
+
+  _onAnimationFinish() {
+    if (this._showing) {
+      this.entryAnimation = false;
+      this.exitAnimation = true;
+    }
+  }
+
+  _onAnimationEnd() {
+    this._animationPlaying = false;
+    if (!this._showing) {
+      this.exitAnimation = false;
+      this.tooltipVisible = false;
+    }
   }
 
   updatePosition(target) {
