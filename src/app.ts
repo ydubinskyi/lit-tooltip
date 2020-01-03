@@ -162,8 +162,8 @@ export class AppElement extends LitElement {
           </p>
         </div>
         <div class="card">
-          <button id="button_05">Some button 04</button>
-          <lit-tooltip for="button_05">
+          <button id="button_07">Some button 07</button>
+          <lit-tooltip for="button_07">
             Tooltip text 5
           </lit-tooltip>
         </div>
@@ -207,6 +207,17 @@ export class AppElement extends LitElement {
             aspernatur amet eveniet doloremque a, facilis ducimus consectetur necessitatibus! Eaque consequatur error
             dolorem.
           </p>
+        </div>
+        <div class="card">
+          <button id="button_08">Some button 08</button>
+          <lit-tooltip for="button_08" position="right">
+            Corrupti nisi, est placeat facilis quia rerum hic magni provident. Laboriosam aspernatur reprehenderit,
+            ullam eligendi ea voluptatum quia non maiores ab necessitatibus, consequuntur autem, illo quaerat delectus?
+            Amet consectetur ipsum ipsam et exercitationem autem debitis eius itaque, vero iusto sequi quod. Dolores
+            impedit nam ex non laudantium perspiciatis dolorem qui cum similique culpa dolorum, harum laboriosam quas.
+            Quisquam quos fugit, culpa a eum incidunt blanditiis veritatis id. Dicta exercitationem aspernatur amet
+            eveniet doloremque a, facilis ducimus consectetur necessitatibus! Eaque consequatur error dolorem.
+          </lit-tooltip>
         </div>
       </section>
       <lit-tooltip-container></lit-tooltip-container>

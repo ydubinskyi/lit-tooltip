@@ -6,10 +6,10 @@ class LitTooltipElement extends LitElement {
   for: string;
 
   @property({type: String})
-  position = 'bottom';
+  position: string;
 
   @property({type: Number})
-  offset = 12;
+  offset: number;
 
   @query('#slot')
   protected slotEl: HTMLSlotElement;

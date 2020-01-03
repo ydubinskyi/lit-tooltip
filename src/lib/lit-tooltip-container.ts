@@ -4,6 +4,12 @@ import {styleMap} from 'lit-html/directives/style-map.js';
 
 @customElement('lit-tooltip-container')
 class LitTooltipContainerElement extends LitElement {
+  @property({type: String})
+  defaultPosition = 'bottom';
+
+  @property({type: Number})
+  defaultOffset = 12;
+
   @property({attribute: false})
   content = '';
 
@@ -27,8 +33,8 @@ class LitTooltipContainerElement extends LitElement {
   _animationPlaying = false;
 
   _tooltipConfig = {
-    offset: 12,
-    position: 'bottom',
+    position: this.defaultPosition,
+    offset: this.defaultOffset,
   };
 
   static get styles() {
@@ -149,8 +155,8 @@ class LitTooltipContainerElement extends LitElement {
     // Get config and content for the tooltip
     this.content = content;
     this._tooltipConfig = {
-      position,
-      offset,
+      position: position || this.defaultPosition,
+      offset: offset || this.defaultOffset,
     };
 
     // Need to wait to calculate the tooltip size to properly update position
