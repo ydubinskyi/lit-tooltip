@@ -19,11 +19,8 @@
     "url": "git+https://github.com/ydubinskyi/lit-tooltip.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "ydubinskyi",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ydubinskyi/lit-tooltip/issues"
-  },
   "homepage": "https://github.com/ydubinskyi/lit-tooltip#readme",
   "devDependencies": {
     "html-webpack-plugin": "^3.2.0",
