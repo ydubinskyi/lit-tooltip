@@ -1,4 +1,11 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {
+  LitElement,
+  html,
+  css,
+  customElement,
+  property,
+  query,
+} from 'lit-element';
 
 @customElement('lit-tooltip')
 class LitTooltipElement extends LitElement {
@@ -27,7 +34,10 @@ class LitTooltipElement extends LitElement {
     if (this.for) {
       target = parentNode.querySelector('#' + this.for);
     } else {
-      target = parentNode.nodeType == Node.DOCUMENT_FRAGMENT_NODE ? ownerRoot.host : parentNode;
+      target =
+        parentNode.nodeType == Node.DOCUMENT_FRAGMENT_NODE
+          ? ownerRoot.host
+          : parentNode;
     }
 
     return target;
@@ -105,7 +115,7 @@ class LitTooltipElement extends LitElement {
       this._target.addEventListener('focus', this.show, {passive: true});
       this._target.addEventListener('mouseleave', this.hide), {passive: true};
       this._target.addEventListener('blur', this.hide, {passive: true});
-      this._target.addEventListener('tap', this.hide), {passive: true};
+      this._target.addEventListener('tap', this.hide, {passive: true});
     }
   }
 
