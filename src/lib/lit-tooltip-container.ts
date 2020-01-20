@@ -159,9 +159,11 @@ class LitTooltipContainerElement extends LitElement {
       offset: offset || this.defaultOffset,
     };
 
+    const tooltip = this.shadowRoot.getElementById('tooltip');
+
     // Need to wait to calculate the tooltip size to properly update position
     await new Promise((resolve) => requestAnimationFrame(() => resolve()));
-    this.updatePosition(target);
+    this.updatePosition(target, tooltip);
 
     this._animationPlaying = true;
     this.entryAnimation = true;
@@ -204,56 +206,88 @@ class LitTooltipContainerElement extends LitElement {
     }
   }
 
-  updatePosition(target: HTMLElement) {
+  updatePosition(target: HTMLElement, tooltip: HTMLElement) {
     const {offset, position} = this._tooltipConfig;
 
     const targetRect = target.getBoundingClientRect();
-    const thisRect = this.shadowRoot.getElementById('tooltip').getBoundingClientRect();
-    const horizontalCenterOffset = (targetRect.width - thisRect.width) / 2;
-    const verticalCenterOffset = (targetRect.height - thisRect.height) / 2;
+    const tooltipRect = tooltip.getBoundingClientRect();
+
     const targetLeft = targetRect.left;
     const targetTop = targetRect.top;
+    const targetHeight = targetRect.height;
+    const targetWidth = targetRect.width;
 
-    let tooltipTop;
-    let tooltipLeft;
+    const tooltipHeight = tooltipRect.height;
+    const tooltipWidth = tooltipRect.width;
+
+    const horizontalCenterOffset = (targetWidth - tooltipWidth) / 2;
+    const verticalCenterOffset = (targetHeight - tooltipHeight) / 2;
+
+    const isPositionVertical = (position) =>
+      ['top', 'bottom'].includes(position);
+
+    let tooltipPosTop;
+    let tooltipPosLeft;
+
+    // get basic position of the tooltip
     switch (position) {
       case 'top':
-        tooltipLeft = targetLeft + horizontalCenterOffset;
-        tooltipTop = targetTop - thisRect.height - offset;
+        tooltipPosLeft = targetLeft + horizontalCenterOffset;
+        tooltipPosTop = targetTop - tooltipHeight - offset;
         break;
       case 'bottom':
-        tooltipLeft = targetLeft + horizontalCenterOffset;
-        tooltipTop = targetTop + targetRect.height + offset;
+        tooltipPosLeft = targetLeft + horizontalCenterOffset;
+        tooltipPosTop = targetTop + targetHeight + offset;
         break;
       case 'left':
-        tooltipLeft = targetLeft - thisRect.width - offset;
-        tooltipTop = targetTop + verticalCenterOffset;
+        tooltipPosLeft = targetLeft - tooltipWidth - offset;
+        tooltipPosTop = targetTop + verticalCenterOffset;
         break;
       case 'right':
-        tooltipLeft = targetLeft + targetRect.width + offset;
-        tooltipTop = targetTop + verticalCenterOffset;
+        tooltipPosLeft = targetLeft + targetWidth + offset;
+        tooltipPosTop = targetTop + verticalCenterOffset;
         break;
     }
 
-    if (tooltipLeft + thisRect.width > window.innerWidth) {
-      tooltipLeft = targetLeft - thisRect.width - offset;
-    } else if (tooltipLeft < 0 && position === 'left') {
-      tooltipLeft = targetLeft + targetRect.width + offset;
-    } else {
-      tooltipLeft = Math.max(targetLeft, tooltipLeft);
+    // tooltip crosses right window border
+    if (tooltipPosLeft + tooltipWidth > window.innerWidth) {
+      if (isPositionVertical(position)) {
+        tooltipPosLeft = targetLeft + targetWidth - tooltipWidth;
+      } else {
+        tooltipPosLeft = targetLeft - tooltipWidth - offset;
+      }
     }
 
-    if (tooltipTop + thisRect.height > window.innerHeight) {
-      tooltipTop = targetTop - thisRect.height - offset;
-    } else if (tooltipTop < 0) {
-      tooltipTop = targetTop + targetRect.height + offset;
-    } else {
-      tooltipTop = tooltipTop;
+    // tooltip cross left window border
+    if (tooltipPosLeft < 0) {
+      if (isPositionVertical(position)) {
+        tooltipPosLeft = targetLeft;
+      } else {
+        tooltipPosLeft = targetLeft + targetWidth + offset;
+      }
+    }
+
+    // tooltip cross bottom window border
+    if (tooltipPosTop + tooltipHeight > window.innerHeight) {
+      if (isPositionVertical(position)) {
+        tooltipPosTop = targetTop - tooltipHeight - offset;
+      } else {
+        tooltipPosTop = targetTop + targetHeight - tooltipHeight;
+      }
+    }
+
+    // tooltip cross top window border
+    if (tooltipPosTop < 0) {
+      if (isPositionVertical(position)) {
+        tooltipPosTop = targetTop + targetHeight + offset;
+      } else {
+        tooltipPosTop = targetTop;
+      }
     }
 
     this.tooltipPosition = {
-      top: tooltipTop + 'px',
-      left: tooltipLeft + 'px',
+      top: tooltipPosTop + 'px',
+      left: tooltipPosLeft + 'px',
     };
   }
 
