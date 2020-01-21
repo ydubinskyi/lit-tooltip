@@ -23,14 +23,7 @@ class LitTooltipContainerElement extends LitElement {
   tooltipVisible = false;
 
   @property({attribute: false})
-  entryAnimation = false;
-
-  @property({attribute: false})
-  exitAnimation = false;
-
-  _showing = false;
-
-  _animationPlaying = false;
+  _animating = false;
 
   _tooltipConfig = {
     position: this.defaultPosition,
@@ -99,9 +92,9 @@ class LitTooltipContainerElement extends LitElement {
 
   render() {
     let classes = {
-      hidden: !this.tooltipVisible,
-      'entry-animation': this.entryAnimation,
-      'exit-animation': this.exitAnimation,
+      hidden: !this.tooltipVisible && !this._animating,
+      'entry-animation': this.tooltipVisible && this._animating,
+      'exit-animation': !this.tooltipVisible && this._animating,
     };
 
     return html`
@@ -138,12 +131,10 @@ class LitTooltipContainerElement extends LitElement {
   }
 
   async showTooltip({detail}: CustomEvent) {
-    if (this._showing) return;
+    if (this.tooltipVisible) return;
 
-    this._showing = true;
-
+    this._animating = true;
     this.tooltipVisible = true;
-    this.exitAnimation = false;
 
     this.tooltipPosition = {
       top: '',
@@ -164,46 +155,25 @@ class LitTooltipContainerElement extends LitElement {
     // Need to wait to calculate the tooltip size to properly update position
     await new Promise((resolve) => requestAnimationFrame(() => resolve()));
     this.updatePosition(target, tooltip);
-
-    this._animationPlaying = true;
-    this.entryAnimation = true;
   }
 
   hideTooltip() {
-    if (!this._showing) return;
+    if (!this.tooltipVisible) return;
 
-    if (this._animationPlaying) {
-      this._showing = false;
-      this._cancelAnimation();
+    if (this._animating) {
+      // cancel ongoing fade in animation
+      this._animating = false;
+      this.tooltipVisible = false;
       return;
-    } else {
-      this._onAnimationFinish();
     }
 
-    this._showing = false;
-    this._animationPlaying = true;
-  }
-
-  _cancelAnimation() {
-    this.entryAnimation = false;
-    this.exitAnimation = false;
+    this._animating = true;
 
     this.tooltipVisible = false;
   }
 
-  _onAnimationFinish() {
-    if (this._showing) {
-      this.entryAnimation = false;
-      this.exitAnimation = true;
-    }
-  }
-
   _onAnimationEnd() {
-    this._animationPlaying = false;
-    if (!this._showing) {
-      this.exitAnimation = false;
-      this.tooltipVisible = false;
-    }
+    this._animating = false;
   }
 
   updatePosition(target: HTMLElement, tooltip: HTMLElement) {
@@ -302,7 +272,7 @@ class LitTooltipContainerElement extends LitElement {
   _removeEventListeners() {
     document.body.removeEventListener('show-tooltip', this.showTooltip);
     document.body.removeEventListener('hide-tooltip', this.hideTooltip);
-    document.body.removeEventListener('scroll', this.hideTooltip);
+    window.removeEventListener('scroll', this.hideTooltip);
 
     this.removeEventListener('mouseenter', this.hideTooltip);
   }
