@@ -113,7 +113,7 @@ class LitTooltipElement extends LitElement {
     if (this._target) {
       this._target.addEventListener('mouseenter', this.show, {passive: true});
       this._target.addEventListener('focus', this.show, {passive: true});
-      this._target.addEventListener('mouseleave', this.hide), {passive: true};
+      this._target.addEventListener('mouseleave', this.hide, {passive: true});
       this._target.addEventListener('blur', this.hide, {passive: true});
       this._target.addEventListener('tap', this.hide, {passive: true});
     }
